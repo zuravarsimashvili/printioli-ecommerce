@@ -1,0 +1,298 @@
+<!-- Announcement Top Bar -->
+<div class="top-bar" style="background-color: #1E3B2B !important; color: #FFFFFF !important; padding: 12px 24px;">
+  <div class="top-bar-inner">
+    <div style="color: #FFFFFF !important; font-weight: 700; font-size: 0.9rem;">
+      🚚 მიწოდება: თბილისი GEL 6.00 / რეგიონები GEL 10.00 | უფასო მიწოდება 100₾-ზე ზევით
+    </div>
+    <div style="display: flex; gap: 20px; align-items: center; color: #FFFFFF !important;">
+      <span style="color: #FFFFFF !important; font-weight: 700; font-size: 0.9rem;">📞 +995 599 00 00 00</span>
+      <select class="lang-select">
+        <option value="ge">🌐 GE</option>
+        <option value="en">🇬🇧 EN</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Header Navigation -->
+<header>
+  <div class="nav-inner">
+    <a href="#" class="logo-box">
+      <div class="logo-icon">👕</div>
+      <span>PRINTIOLI</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#sector-main">დიზაინის შექმნა</a></li>
+      <li><a href="#sector-secondary">პროდუქტები</a></li>
+      <li><a href="#sector-catalog">მზა დიზაინები</a></li>
+      <li><a href="#sector-about">ჩვენს შესახებ</a></li>
+      <li><a href="#sector-checkout">შეკვეთა</a></li>
+    </ul>
+
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <a href="#sector-checkout" class="cart-link-btn">🛒 კალათა ({{ uploadedImageUrl ? 1 : 0 }})</a>
+    </div>
+  </div>
+</header>
+
+<!-- SECTOR 1: Main Interactive POD Creator -->
+<section class="sector-hero" id="sector-main">
+  <div class="sector-hero-inner">
+    <div>
+      <h1 class="hero-title">დაამზადე შენი დიზაინი 1 წკაპით</h1>
+      <p class="hero-subtitle">აირჩიე პროდუქტი, ფერი, ბეჭდვის ზომა და ატვირთე ფოტო!</p>
+      
+      <!-- Primary 4 Products Selector -->
+      <div class="primary-products-grid">
+        <div class="product-select-btn" [class.active]="selectedProduct.includes('მაისური')" (click)="selectProduct('👕 მაისური', 18)">
+          <h4>👕 მაისური</h4>
+          <p>18 GEL-დან</p>
+        </div>
+        <div class="product-select-btn" [class.active]="selectedProduct.includes('ჩანთა')" (click)="selectProduct('🛍️ ნაჭრის ჩანთა', 15)">
+          <h4>🛍️ ნაჭრის ჩანთა</h4>
+          <p>15 GEL-დან</p>
+        </div>
+        <div class="product-select-btn" [class.active]="selectedProduct.includes('სვიტრი')" (click)="selectProduct('🧥 სვიტრი', 38)">
+          <h4>🧥 სვიტრი</h4>
+          <p>38 GEL-დან</p>
+        </div>
+        <div class="product-select-btn" [class.active]="selectedProduct.includes('ჰუდი')" (click)="selectProduct('🔥 ჰუდი (Hoodie)', 45)">
+          <h4>🔥 ჰუდი (Hoodie)</h4>
+          <p>45 GEL-დან</p>
+        </div>
+      </div>
+
+      <!-- Color Selector Options -->
+      <div class="option-group">
+        <label class="option-label">🎨 აირჩიე პროდუქტის ფერი:</label>
+        <div class="color-swatches">
+          <div *ngFor="let c of colors" 
+               class="swatch" 
+               [style.background-color]="c.hex" 
+               [class.border-swatch]="c.border"
+               [class.selected-swatch]="selectedColor === c.hex"
+               (click)="selectColor(c.hex)"
+               [title]="c.name">
+          </div>
+        </div>
+      </div>
+
+      <!-- Size Selector (A4 vs A3) -->
+      <div class="option-group">
+        <label class="option-label">📏 აირჩიე ბეჭდვის ზომა:</label>
+        <div class="size-toggle-buttons">
+          <button type="button" class="size-btn" [class.active]="selectedSize === 'A4'" (click)="selectPrintSize('A4')">
+            A4 (29x21 სმ)
+          </button>
+          <button type="button" class="size-btn" [class.active]="selectedSize === 'A3'" (click)="selectPrintSize('A3')">
+            A3 (29x42 სმ) (+5 GEL)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Preview & Upload Card -->
+    <div class="design-upload-card">
+      <div class="price-header">
+        <span style="font-weight: 800; color: #0F172A;">საბოლოო ფასი:</span>
+        <span class="live-price-tag">{{ finalPrice }} GEL</span>
+      </div>
+      
+      <!-- Dynamic SVG Mockup with Live Preview -->
+      <div class="mockup-display-area">
+        <svg viewBox="0 0 200 200" width="100%" height="200">
+          <path d="M 50,40 L 70,20 L 130,20 L 150,40 L 185,60 L 165,100 L 150,90 L 150,180 L 50,180 L 50,90 L 35,100 L 15,60 Z" 
+                [attr.fill]="selectedColor" 
+                stroke="#1E3B2B" 
+                stroke-width="2"/>
+          
+          <rect [attr.x]="selectedSize === 'A3' ? '60' : '65'" 
+                [attr.y]="selectedSize === 'A3' ? '50' : '65'" 
+                [attr.width]="selectedSize === 'A3' ? '80' : '70'" 
+                [attr.height]="selectedSize === 'A3' ? '110' : '75'" 
+                fill="rgba(235, 233, 223, 0.4)" 
+                stroke="#528564" 
+                stroke-width="2" 
+                stroke-dasharray="4"/>
+
+          <image *ngIf="uploadedImageUrl" 
+                 [attr.href]="uploadedImageUrl" 
+                 [attr.x]="selectedSize === 'A3' ? '62' : '67'" 
+                 [attr.y]="selectedSize === 'A3' ? '52' : '67'" 
+                 [attr.width]="selectedSize === 'A3' ? '76' : '66'" 
+                 [attr.height]="selectedSize === 'A3' ? '106' : '71'" 
+                 preserveAspectRatio="xMidYMid slice"/>
+
+          <text *ngIf="!uploadedImageUrl" x="100" y="105" [attr.fill]="selectedColor === '#FFFFFF' ? '#0F172A' : '#FFFFFF'" font-size="10" font-weight="bold" text-anchor="middle">
+            {{ selectedSize }} პრინტი
+          </text>
+        </svg>
+      </div>
+
+      <div class="upload-drop-zone" (click)="fileInput.click()">
+        <p *ngIf="!uploadedImageUrl" style="font-weight: 800; color: #1E3B2B;">ჩააგდე ფაილი აქ ან დააჭირე ატვირთვას</p>
+        <p *ngIf="!uploadedImageUrl" style="font-size: 0.85rem; color: #475569; margin-top: 4px;">PNG, JPG, PDF</p>
+        
+        <div *ngIf="uploadedImageUrl" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+          <span style="font-weight: 800; color: #528564;">✅ ფოტო ატვირთულია!</span>
+          <button type="button" class="btn-clear-img" (click)="clearUploadedImage($event)">❌ წაშლა</button>
+        </div>
+
+        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+        <button *ngIf="!uploadedImageUrl" class="btn-upload-file">📁 ფოტოს არჩევა</button>
+      </div>
+
+      <a href="#sector-checkout" class="btn-checkout-now">🛍️ შეკვეთის გაფორმება</a>
+    </div>
+  </div>
+</section>
+
+<!-- SECTOR 2: Secondary Products -->
+<section class="sector-container" id="sector-secondary">
+  <h2 class="sector-title">სხვა პროდუქტები</h2>
+  <p class="sector-desc">დააბეჭდე ნებისმიერ აქსესუარზე</p>
+
+  <div class="secondary-grid">
+    <div class="secondary-card"><div class="secondary-icon">☕</div><div class="secondary-name">ჭიქა</div><div class="secondary-price">15 GEL</div></div>
+    <div class="secondary-card"><div class="secondary-icon">🛋️</div><div class="secondary-name">ბალიში</div><div class="secondary-price">20 GEL</div></div>
+    <div class="secondary-card"><div class="secondary-icon">🧩</div><div class="secondary-name">პაზლი</div><div class="secondary-price">18 GEL</div></div>
+    <div class="secondary-card"><div class="secondary-icon">🥤</div><div class="secondary-name">თერმოსი</div><div class="secondary-price">25 GEL</div></div>
+    <div class="secondary-card"><div class="secondary-icon">👕</div><div class="secondary-name">პოლო მაისური</div><div class="secondary-price">22 GEL</div></div>
+    <div class="secondary-card"><div class="secondary-icon">🏷️</div><div class="secondary-name">სტიკერები</div><div class="secondary-price">10 GEL</div></div>
+  </div>
+</section>
+
+<!-- SECTOR 3: Ready Designs Catalog -->
+<section class="sector-container" id="sector-catalog">
+  <h2 class="sector-title">მზა დიზაინების კატალოგი</h2>
+  <p class="sector-desc">აირჩიე პოპულარული პრინტები კოლექციებიდან</p>
+
+  <div class="catalog-grid">
+    <div class="catalog-card">
+      <span class="catalog-tag">🎌 ანიმე & გეიმინგი</span>
+      <h3 style="font-weight: 900; color: #1E3B2B; margin-bottom: 8px;">Naruto / One Piece / Berserk</h3>
+      <p style="color: #475569; font-weight: 600; font-size: 0.95rem;">პოპულარული ანიმეს პრინტები A4 და A3 ფორმატში.</p>
+    </div>
+    <div class="catalog-card">
+      <span class="catalog-tag">🏀 სპორტი & NBA</span>
+      <h3 style="font-weight: 900; color: #1E3B2B; margin-bottom: 8px;">Steph Curry / Bulls 23</h3>
+      <p style="color: #475569; font-weight: 600; font-size: 0.95rem;">სპორტული ლეგენდების და გუნდების მაისურები.</p>
+    </div>
+    <div class="catalog-card">
+      <span class="catalog-tag">🏋️ ბოდიბილდინგი</span>
+      <h3 style="font-weight: 900; color: #1E3B2B; margin-bottom: 8px;">Heavy Duty / Toma Pump</h3>
+      <p style="color: #475569; font-weight: 600; font-size: 0.95rem;">სავარჯიშო მოტივაციური პრინტები და ჰუდები.</p>
+    </div>
+    <div class="catalog-card">
+      <span class="catalog-tag">🎸 როკი & მუსიკა</span>
+      <h3 style="font-weight: 900; color: #1E3B2B; margin-bottom: 8px;">Black Sabbath / Metallica</h3>
+      <p style="color: #475569; font-weight: 600; font-size: 0.95rem;">ლეგენდარული როკ-ჯგუფების პრინტები.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTOR 4: About Us & Print Standards (A4 vs A3) -->
+<section class="sector-container" id="sector-about">
+  <div class="standards-box">
+    <div>
+      <h2 style="font-size: 2rem; font-weight: 900; color: #1E3B2B; margin-bottom: 14px;">📏 ჩვენს შესახებ & ბეჭდვის ზომები</h2>
+      <p style="color: #0F172A; font-weight: 600; margin-bottom: 20px;">
+        Printioli არის შენი ონლაინ პრინტ-ონ-დიმანდ პლატფორმა. ჩვენ ვბეჭდავთ უმაღლესი ხარისხის DTF ტექნოლოგიით, რომელიც არ გადადის და არ ზიანდება რეცხვისას.
+      </p>
+      <div>
+        <span class="size-badge-pill">📐 A4 ზომა (29x21 სმ)</span>
+        <span class="size-badge-pill">📐 A3 ზომა (29x42 სმ)</span>
+      </div>
+    </div>
+    <div style="text-align: center;">
+      <svg viewBox="0 0 300 180" width="100%" height="160">
+        <g transform="translate(10, 10)">
+          <path d="M 20,30 L 40,15 L 90,15 L 110,30 L 130,45 L 115,75 L 105,68 L 105,140 L 25,140 L 25,68 L 15,75 Z" fill="#FFFFFF" stroke="#1E3B2B" stroke-width="2"/>
+          <rect x="42" y="45" width="46" height="35" fill="#EBE9DF" stroke="#528564" stroke-width="2"/>
+          <text x="65" y="62" font-size="10" font-weight="900" text-anchor="middle" fill="#1E3B2B">A4</text>
+        </g>
+        <g transform="translate(150, 10)">
+          <path d="M 20,30 L 40,15 L 90,15 L 110,30 L 130,45 L 115,75 L 105,68 L 105,140 L 25,140 L 25,68 L 15,75 Z" fill="#FFFFFF" stroke="#1E3B2B" stroke-width="2"/>
+          <rect x="40" y="40" width="50" height="75" fill="#DDE4DC" stroke="#528564" stroke-width="2"/>
+          <text x="65" y="75" font-size="11" font-weight="900" text-anchor="middle" fill="#1E3B2B">A3</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- SECTOR 5: Dual Checkout Form -->
+<section class="checkout-sector" id="sector-checkout">
+  <div class="checkout-tabs">
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'quick'" (click)="activeTab = 'quick'">⚡ სწრაფი შეკვეთა</button>
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'account'" (click)="activeTab = 'account'">🎁 სრული რეგისტრაცია (ფასდაკლება)</button>
+  </div>
+
+  <form (ngSubmit)="submitOrder()">
+    <div class="form-grid">
+      <input type="text" [(ngModel)]="fullName" name="fullName" placeholder="სახელი და გვარი *" class="form-input" required>
+      <input type="tel" [(ngModel)]="phone" name="phone" placeholder="ტელეფონის ნომერი *" class="form-input" required>
+    </div>
+    <input type="text" [(ngModel)]="address" name="address" placeholder="მიწოდების მისამართი (ქალაქი, ქუჩა, ბინა) *" class="form-input" required>
+    
+    <div *ngIf="activeTab === 'account'" class="form-grid">
+      <input type="email" [(ngModel)]="email" name="email" placeholder="ელ-ფოსტა *" class="form-input" required>
+      <input type="text" [(ngModel)]="promoCode" name="promoCode" placeholder="პრომო-კოდი" class="form-input">
+    </div>
+
+    <textarea [(ngModel)]="comment" name="comment" rows="3" placeholder="კომენტარი შეკვეთაზე (მაგ: სპეციალური ზომა)" class="form-input"></textarea>
+    <button type="submit" class="btn-submit-order">🛍️ შეკვეთის გაფორმება ({{ finalPrice }} GEL)</button>
+  </form>
+</section>
+
+<!-- Success Modal -->
+<div *ngIf="isOrderModalOpen" class="modal-backdrop">
+  <div class="modal-card">
+    <div style="font-size: 3rem; margin-bottom: 10px;">🎉</div>
+    <h2 style="color: #1E3B2B; font-weight: 900; margin-bottom: 8px;">შეკვეთა მიღებულია!</h2>
+    <p style="color: #475569; font-weight: 600; margin-bottom: 16px;">
+      გმადლობთ, <strong>{{ fullName }}</strong>! ჩვენი მენეჯერი დაგიკავშირდებათ ნომერზე <strong>{{ phone }}</strong> დეტალების დასაზუსტებლად.
+    </p>
+
+    <div style="background: #EBE9DF; padding: 12px; border-radius: 8px; font-weight: 800; color: #1E3B2B; margin-bottom: 20px;">
+      პროდუქტი: {{ selectedProduct }} ({{ selectedSize }}) — {{ finalPrice }} GEL
+    </div>
+
+    <button type="button" class="btn-submit-order" (click)="closeModal()">მშვენიერია!</button>
+  </div>
+</div>
+
+<!-- Sticky Mobile Action Bar -->
+<div class="mobile-sticky-bar">
+  <a href="#sector-main" class="sticky-btn">🎨 დიზაინი</a>
+  <a href="#sector-checkout" class="sticky-btn secondary">🛒 შეკვეთა ({{ finalPrice }}₾)</a>
+</div>
+
+<!-- Footer -->
+<footer style="background-color: #1E3B2B !important; color: #FFFFFF !important; padding: 60px 24px 30px; margin-top: 80px;">
+  <div class="footer-inner">
+    <div>
+      <div class="logo-box" style="color: white; margin-bottom: 14px;">
+        <div class="logo-icon">👕</div>
+        <span style="color: #FFFFFF !important;">PRINTIOLI</span>
+      </div>
+      <p style="color: #FFFFFF !important;">შენი ონლაინ პრინტ-ონ-დიმანდ პლატფორმა საქართველოში.</p>
+    </div>
+    <div>
+      <h4 style="color: #A7F3D0 !important;">ნავიგაცია</h4>
+      <p><a href="#sector-main" style="color: #FFFFFF !important;">დიზაინის შექმნა</a></p>
+      <p><a href="#sector-secondary" style="color: #FFFFFF !important;">პროდუქტები</a></p>
+    </div>
+    <div>
+      <h4 style="color: #A7F3D0 !important;">ინფორმაცია</h4>
+      <p><a href="#sector-about" style="color: #FFFFFF !important;">ჩვენს შესახებ</a></p>
+    </div>
+    <div>
+      <h4 style="color: #A7F3D0 !important;">კონტაქტი</h4>
+      <p style="color: #FFFFFF !important;">📞 +995 599 00 00 00</p>
+      <p style="color: #FFFFFF !important;">✉️ printioli.info@gmail.com</p>
+    </div>
+  </div>
+  <div class="footer-bottom" style="color: #FFFFFF !important; border-top-color: #2D4A3E;">© 2026 Printioli. ყველა უფლება დაცულია.</div>
+</footer>
