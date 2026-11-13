@@ -285,11 +285,33 @@ const INITIAL_REVIEWS: Record<string, Review[]> = {
   styleUrl: './app.css'
 })
 export class AppComponent implements OnInit {
+  private readonly ADMIN_EMAILS = ['zu.varsimashvili@gmail.com', 'admin@printioli.ge'];
+
+  get isAdmin(): boolean {
+    if (!this.user?.email) return false;
+    return this.ADMIN_EMAILS.includes(this.user.email.trim().toLowerCase());
+  }
   private readonly API_URL = 'https://api.everrest.educata.dev';
 
   // Navigation State: 'catalog' | 'detail' | 'studio' | 'cart'
-  activePage: 'catalog' | 'detail' | 'studio' | 'cart' = 'catalog';
+  activePage: 'catalog' | 'detail' | 'studio' | 'cart' | 'admin' = 'catalog';
   selectedProductId = 'pr-101';
+
+  // Admin Panel: Registered Users & Product Management
+registeredUsers: { firstName: string; lastName: string; email: string; password?: string; avatar?: string }[] = [  {
+    firstName: 'Zura',
+    lastName: 'Varsimashvili',
+    email: 'zu.varsimashvili@gmail.com',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zurab'
+  }
+];
+loadingUsers = false;
+newProdTitle = '';
+newProdPrice = 65;
+newProdCategory = 'მაისურები';
+newProdBrand = 'Printioli Atelier';
+newProdStock = 15;
+newProdImage = 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80';
 
   // Products & API
   products: Product[] = [...INITIAL_PRODUCTS];
@@ -538,10 +560,12 @@ export class AppComponent implements OnInit {
     return product.reviewsCount + (this.reviewsMap[product._id]?.length || 0);
   }
 
-  // ავტორიზაცია (Everrest API + Fallback)
-  async handleLogin(): Promise<void> {
-    if (!this.authEmail || !this.authPassword) {
-      this.showToast('გთხოვთ შეავსოთ ელ.ფოსტა და პაროლი');
+ async handleLogin(): Promise<void> {
+    const email = this.authEmail.trim();
+    const password = this.authPassword;
+
+    if (!email || !password) {
+      this.showToast('შეიყვანეთ ელ.ფოსტა და პაროლი');
       return;
     }
 
@@ -549,22 +573,38 @@ export class AppComponent implements OnInit {
       const res = await fetch(`${this.API_URL}/auth/sign_in`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: this.authEmail, password: this.authPassword })
+        body: JSON.stringify({ email, password })
       });
+
       if (res.ok) {
         const data = await res.json();
-        this.token = data.access_token || null;
+        this.token = data.access_token;
+        const nameFromEmail = email.split('@')[0];
+        this.user = { name: nameFromEmail, email };
+        this.isLoginOpen = false;
+        this.authPassword = '';
+        this.showToast(`მოგესალმებით, ${nameFromEmail}!`);
+        return;
       }
-    } catch {}
 
-    const name = this.authName || this.authEmail.split('@')[0];
-    this.user = { name, email: this.authEmail };
-    this.isLoginOpen = false;
-    this.authEmail = '';
-    this.authPassword = '';
-    this.showToast(`მოგესალმებით, ${name}!`);
+      const localMatch = this.registeredUsers.find(
+        u => u.email?.toLowerCase() === email.toLowerCase() && u.password === password
+      );
+
+      if (localMatch) {
+        const fullName = `${localMatch.firstName} ${localMatch.lastName}`.trim();
+        this.user = { name: fullName, email: localMatch.email };
+        this.isLoginOpen = false;
+        this.authPassword = '';
+        this.showToast(`მოგესალმებით, ${fullName}!`);
+        return;
+      }
+
+      this.showToast('არასწორი ელ.ფოსტა ან პაროლი! გთხოვთ გაიაროთ რეგისტრაცია.');
+    } catch {
+      this.showToast('სერვერთან კავშირი ვერ დამყარდა');
+    }
   }
-
   // რეგისტრაცია (Everrest API + Fallback)
   async handleRegister(): Promise<void> {
     if (!this.authEmail || !this.authPassword || !this.authName) {
@@ -593,6 +633,13 @@ export class AppComponent implements OnInit {
     } catch {}
 
     this.user = { name: this.authName, email: this.authEmail };
+   this.registeredUsers.unshift({
+      firstName: parts[0],
+      lastName: parts[1] || '',
+      email: this.authEmail,
+      password: this.authPassword,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${parts[0]}`
+    });
     this.isRegisterOpen = false;
     this.authEmail = '';
     this.authPassword = '';
@@ -601,10 +648,13 @@ export class AppComponent implements OnInit {
   }
 
   handleLogout(): void {
-    this.user = null;
-    this.token = null;
-    this.showToast('თქვენ გამოხვედით სისტემიდან');
+  this.user = null;
+  this.token = null;
+  if (this.activePage === 'admin') {
+    this.activePage = 'catalog';
   }
+  this.showToast('თქვენ გამოხვედით სისტემიდან');
+}
 
   // შეფასების დამატება (Rating + სახელი გვარი + OK)
   handleAddReview(): void {
@@ -688,4 +738,70 @@ export class AppComponent implements OnInit {
     this.activePage = 'catalog';
     this.showToast('შეკვეთა წარმატებით გაფორმდა!');
   }
+async openAdminPanel(): Promise<void> {
+  if (!this.isAdmin) {
+  this.showToast('წვდომა შეზღუდულია! საჭიროა ადმინის უფლებები.');
+  return;
+}
+  this.activePage = 'admin';
+  this.loadingUsers = true;
+  try {
+    const headers: Record<string, string> = {};
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+    const res = await fetch(`${this.API_URL}/auth/all?page_index=1&page_size=20`, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      const apiUsers = Array.isArray(data) ? data : data?.users || [];
+      if (apiUsers.length > 0) {
+        this.registeredUsers = apiUsers.map((u: any) => ({
+          firstName: u.firstName || 'User',
+          lastName: u.lastName || '',
+          email: u.email || 'no-email@everrest.ge',
+          avatar: u.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.firstName || 'U'}`
+        }));
+      }
+    }
+  } catch {
+    // ლოკალური სია აქტიური რჩება
+  } finally {
+    this.loadingUsers = false;
+  }
+}
+
+adminAddProduct(): void {
+  if (!this.newProdTitle.trim()) {
+    this.showToast('ჩაწერეთ პროდუქტის დასახელება');
+    return;
+  }
+  const newItem: Product = {
+    _id: `pr-${Date.now()}`,
+    title: this.newProdTitle.trim(),
+    price: Number(this.newProdPrice) || 59,
+    category: this.newProdCategory,
+    brand: this.newProdBrand,
+    issueDate: new Date().toISOString().split('T')[0],
+    stock: Number(this.newProdStock) || 10,
+    rating: 5.0,
+    reviewsCount: 1,
+    badge: 'NEW ADMIN',
+    description: 'Printioli Studio-ს ახალი კოლექციის მოდელი (240 GSM ორგანული ბამბა).',
+    fabric: '100% ორგანული სავარცხლიანი ბამბა (240 GSM)',
+    technology: 'Kornit HD DTG',
+    fit: 'Oversized Fit',
+    care: 'ნაზი რეცხვა 30°C-ზე.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    printPlacements: ['წინ (მკერდზე)', 'ზურგზე'],
+    images: [this.newProdImage.trim() || INITIAL_PRODUCTS[0].images[0]]
+  };
+  this.products = [newItem, ...this.products];
+  this.newProdTitle = '';
+  this.showToast(`"${newItem.title}" დაემატა კოლექციაში!`);
+}
+
+adminDeleteProduct(id: string): void {
+  this.products = this.products.filter(p => p._id !== id);
+  this.showToast('პროდუქტი წაიშალა მაღაზიიდან');
+}
 }

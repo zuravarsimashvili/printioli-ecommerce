@@ -89,7 +89,17 @@
           <span>🎨</span>
           <span class="hidden sm:inline">Custom Canvas</span>
         </button>
-
+<button
+  (click)="openAdminPanel()"
+  [ngClass]="
+    activePage === 'admin'
+      ? 'bg-black text-white shadow-lg'
+      : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+  "
+  class="text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded-xl transition"
+>
+  Admin
+</button>
         <!-- Cart Icon -->
         <button
           (click)="activePage = 'cart'"
@@ -913,6 +923,175 @@
         </div>
       </div>
     </div>
+  <!-- ==================== PAGE 5: ADMIN PANEL ==================== -->
+<div *ngIf="activePage === 'admin'" class="max-w-6xl mx-auto space-y-10">
+  <div>
+    <span class="px-3 py-1 bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-md">
+      PRINTIOLI CONTROL CENTER
+    </span>
+    <h1 class="text-3xl font-black text-black tracking-tight mt-2 uppercase">
+      ადმინ პანელი — მომხმარებლები და პროდუქცია
+    </h1>
+  </div>
+
+  <!-- 1. REGISTERED USERS TABLE -->
+  <div class="bg-white rounded-3xl border border-zinc-200/90 p-6 sm:p-8 shadow-sm">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-base font-black text-black uppercase tracking-wide">
+          დარეგისტრირებული მომხმარებლები ({{ registeredUsers.length }})
+        </h2>
+        <p class="text-xs text-zinc-400">EverREST API (/auth/all) & ლოკალური რეგისტრაციები</p>
+      </div>
+      <button
+        (click)="openAdminPanel()"
+        class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-black text-xs font-black rounded-xl transition"
+      >
+        განახლება ↻
+      </button>
+    </div>
+
+    <div *ngIf="loadingUsers" class="text-xs font-bold text-zinc-400 py-6 text-center">
+      მომხმარებლების სია იტვირთება...
+    </div>
+
+    <div *ngIf="!loadingUsers" class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-zinc-200 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+            <th class="py-3 px-4">მომხმარებელი</th>
+            <th class="py-3 px-4">ელ.ფოსტა</th>
+            <th class="py-3 px-4">სტატუსი</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-100 text-xs">
+          <tr *ngFor="let u of registeredUsers" class="hover:bg-zinc-50">
+            <td class="py-3.5 px-4 font-black text-black flex items-center gap-3">
+              <img
+                [src]="u.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + u.firstName"
+                class="w-8 h-8 rounded-full bg-zinc-100 border border-zinc-200"
+              />
+              <span>{{ u.firstName }} {{ u.lastName }}</span>
+            </td>
+            <td class="py-3.5 px-4 font-semibold text-zinc-600">{{ u.email }}</td>
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-black">
+                Active Member
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 2. ADD / DELETE PRODUCTS -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Add Product Form -->
+    <div class="bg-white rounded-3xl border border-zinc-200/90 p-6 shadow-sm space-y-4">
+      <h2 class="text-sm font-black text-black uppercase tracking-wide border-b border-zinc-100 pb-3">
+        + ახალი პროდუქტის დამატება
+      </h2>
+
+      <div>
+        <label class="block text-[10px] font-black uppercase text-zinc-400 mb-1">დასახელება</label>
+        <input
+          type="text"
+          placeholder="მაგ: TBILISI NIGHTS Tee"
+          [(ngModel)]="newProdTitle"
+          class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[10px] font-black uppercase text-zinc-400 mb-1">ფასი (₾)</label>
+          <input
+            type="number"
+            [(ngModel)]="newProdPrice"
+            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold"
+          />
+        </div>
+        <div>
+          <label class="block text-[10px] font-black uppercase text-zinc-400 mb-1">მარაგი (Stock)</label>
+          <input
+            type="number"
+            [(ngModel)]="newProdStock"
+            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[10px] font-black uppercase text-zinc-400 mb-1">კატეგორია</label>
+          <select
+            [(ngModel)]="newProdCategory"
+            class="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold"
+          >
+            <option value="მაისურები">მაისურები</option>
+            <option value="ჰუდები">ჰუდები</option>
+            <option value="ეკო-ჩანთები">ეკო-ჩანთები</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-black uppercase text-zinc-400 mb-1">ბრენდი</label>
+          <input
+            type="text"
+            [(ngModel)]="newProdBrand"
+            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[10px] font-black uppercase text-zinc-400 mb-1">სურათის ლინკი (URL)</label>
+        <input
+          type="text"
+          [(ngModel)]="newProdImage"
+          class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold"
+        />
+      </div>
+
+      <button
+        (click)="adminAddProduct()"
+        class="w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow transition"
+      >
+        მაღაზიაში დამატება
+      </button>
+    </div>
+
+    <!-- Existing Products List with Delete -->
+    <div class="lg:col-span-2 bg-white rounded-3xl border border-zinc-200/90 p-6 shadow-sm">
+      <h2 class="text-sm font-black text-black uppercase tracking-wide border-b border-zinc-100 pb-3 mb-4">
+        არსებული კოლექციის მართვა ({{ products.length }})
+      </h2>
+
+      <div class="space-y-3 max-h-[460px] overflow-y-auto pr-1">
+        <div
+          *ngFor="let p of products"
+          class="flex items-center justify-between p-3 bg-zinc-50 rounded-2xl border border-zinc-200/80"
+        >
+          <div class="flex items-center gap-3">
+            <img [src]="p.images[0]" class="w-12 h-12 rounded-xl object-cover bg-white" />
+            <div>
+              <p class="text-xs font-black text-black">{{ p.title }}</p>
+              <p class="text-[11px] font-bold text-zinc-500">
+                {{ p.category }} • {{ p.brand }} • <span class="text-black">{{ p.price }} ₾</span> (მარაგი: {{ p.stock }})
+              </p>
+            </div>
+          </div>
+          <button
+            (click)="adminDeleteProduct(p._id)"
+            class="px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-100 rounded-xl transition"
+          >
+            წაშლა
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>  
   </main>
 
   <!-- FOOTER -->
