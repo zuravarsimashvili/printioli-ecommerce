@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#27272a"/>
+            <stop offset="100%" stop-color="#e11d48" stop-opacity="0.35"/>
+          </linearGradient>
+        </defs>
+        <rect width="800" height="600" fill="#27272a"/>
+        <rect width="800" height="600" fill="url(#g)"/>
+        <circle cx="400" cy="255" r="135" fill="#e11d48" fill-opacity="0.18" stroke="#e11d48" stroke-width="3"/>
+        <rect x="315" y="185" width="170" height="140" rx="22" fill="#e11d48"/>
+        <text x="400" y="268" font-family="Arial, sans-serif" font-size="44" font-weight="bold" fill="#ffffff" text-anchor="middle">PRINTIOLI</text>
+        <text x="400" y="455" font-family="Arial, sans-serif" font-size="30" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="3">MONOCHROME ZIP HOODIE</text>
+        <text x="400" y="495" font-family="Arial, sans-serif" font-size="16" fill="#ffffff" fill-opacity="0.7" text-anchor="middle" letter-spacing="4">ARCHITECTURAL CUT</text>
+      </svg>
