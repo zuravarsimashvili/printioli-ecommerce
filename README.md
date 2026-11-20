@@ -1,59 +1,23 @@
-# PrintioliEcommerce
+# Printioli Studio — Full-Stack E-Commerce & 2D Custom Print Platform
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.6.
+სრულფასოვანი ონლაინ მაღაზია და ინტერაქტიული 2D პრინტ-სტუდია, აგებული **Angular**-ის ფრონტენდსა და **Node.js / Express / SQLite** რელაციურ ბექენდზე.
 
-## Development server
+## ტექნოლოგიური სტეკი
+- **Frontend:** Angular (Standalone Components, Reactive State, Custom CSS)
+- **Backend:** Node.js, Express.js, JWT Authentication, Multer (ლოკალური ფაილების ატვირთვა)
+- **Database:** SQLite3 (`backend/printioli.db`) — 6 რელაციური ცხრილი `FOREIGN KEY` კავშირებით
 
-To start a local development server, run:
+## SQL მონაცემთა ბაზის სტრუქტურა
+1. `users` — მომხმარებლები და როლები (`admin`, `user`)
+2. `products` — პროდუქტების კატალოგი, მარაგები (`stock`) და ატვირთული ფოტოები (`/uploads/...`)
+3. `reviews` — პროდუქტის შეფასებები (`1:N` კავშირი `products` ცხრილთან, ავტომატური `AVG(rating)` გადათვლით)
+4. `cart_items` — ავტორიზებული მომხმარებლის კალათა (`INNER JOIN` პროდუქტებთან)
+5. `orders` — გაფორმებული შეკვეთები (მხარს უჭერს როგორც რეგისტრირებულ, ისე სტუმარ მომხმარებელს)
+6. `order_items` — შეკვეთის დეტალური პოზიციები და Custom Studio-ს დიზაინის პარამეტრები
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## გაშვების ინსტრუქცია
+1. **ბექენდი:**
+   ```bash
+   cd backend
+   npm install
+   node server.js
